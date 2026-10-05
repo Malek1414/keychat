@@ -10,11 +10,19 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "desktop": "vite build && electron .",
-    "desktop:dev": "concurrently -k \"vite --port 5173 --strictPort\" \"wait-on tcp:5173 && cross-env KEYCHAT_DEV_URL=http://localhost:5173 electron .\""
+    "desktop:dev": "concurrently -k \"vite --port 5173 --strictPort\" \"wait-on tcp:5173 && cross-env KEYCHAT_DEV_URL=http://localhost:5173 electron .\"",
+    "dist": "vite build && electron-builder --publish never"
   },
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "cross-env": "^10.1.0",
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
     "highlight.js": "^11.12.0",
     "idb-keyval": "^6.3.0",
     "lucide-react": "^1.52.0",
@@ -23,17 +31,65 @@
     "react-dom": "^19.3.0",
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
-    "remark-gfm": "^4.0.1"
-  },
-  "devDependencies": {
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.1",
-    "concurrently": "^10.0.5",
-    "cross-env": "^10.1.0",
-    "electron": "^44.5.1",
+    "remark-gfm": "^4.0.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.2",
     "wait-on": "^9.5.1"
+  },
+  "author": {
+    "name": "Malek Hassan",
+    "email": "malek.korashi@gmail.com"
+  },
+  "homepage": "https://github.com/Malek1414/keychat",
+  "build": {
+    "appId": "io.github.malek1414.keychat",
+    "productName": "KeyChat",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "package.json"
+    ],
+    "artifactName": "${productName}-${os}-${arch}.${ext}",
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "KeyChat uses the microphone for voice typing and voice mode."
+      }
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    },
+    "afterPack": "build/after-pack.cjs"
   }
 }

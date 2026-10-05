@@ -34,6 +34,23 @@ Grok reads photos and text files; for PDFs, use a GPT or Claude model.
 
 ## Desktop app (macOS, Windows, Linux)
 
+### Download
+
+| Your computer | Download |
+|---|---|
+| Mac with Apple Silicon (M1–M4) | [KeyChat-mac-arm64.dmg](https://github.com/Malek1414/keychat/releases/latest/download/KeyChat-mac-arm64.dmg) |
+| Mac with Intel | [KeyChat-mac-x64.dmg](https://github.com/Malek1414/keychat/releases/latest/download/KeyChat-mac-x64.dmg) |
+| Windows | [KeyChat-win-x64.exe](https://github.com/Malek1414/keychat/releases/latest/download/KeyChat-win-x64.exe) |
+| Linux | [KeyChat-linux-x86_64.AppImage](https://github.com/Malek1414/keychat/releases/latest/download/KeyChat-linux-x86_64.AppImage) |
+
+The apps aren't code-signed (that needs paid Apple/Microsoft certificates), so the first launch takes one extra step:
+
+- **Mac:** open the `.dmg` and drag KeyChat into Applications. Open it; when macOS says it can't verify the app, click **Done**, then go to **System Settings → Privacy & Security**, scroll down and click **Open Anyway**. After that it opens normally.
+- **Windows:** run the installer. If a blue "Windows protected your PC" box appears, click **More info → Run anyway**.
+- **Linux:** make the AppImage executable (`chmod +x KeyChat-*.AppImage`) and run it.
+
+### Or run from source
+
 You need [Node.js](https://nodejs.org) 20 or newer and git.
 
 ```bash
@@ -51,7 +68,10 @@ That builds the app and opens it in its own window. The first `npm install` down
 npm run dev           # web app at http://localhost:5173
 npm run desktop:dev   # desktop window with hot reload
 npm run build         # production web build in dist/
+npm run dist          # desktop installer for this OS in release/
 ```
+
+Pushing a tag like `v1.0.1` builds the Mac, Windows and Linux installers and attaches them to a GitHub release (`.github/workflows/release.yml`).
 
 Every push to `main` deploys the web version to GitHub Pages (`.github/workflows/pages.yml`).
 

@@ -1,0 +1,74 @@
+name: Build desktop installers
+
+# Push a tag like v1.0.1 (or run it by hand) to build the Mac, Windows and
+# Linux apps and attach them to a GitHub release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to create or update (e.g. v1.0.0)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            args: --mac
+          - os: windows-latest
+            args: --win
+          - os: ubuntu-latest
+            args: --linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx vite build
+      - run: npx electron-builder ${{ matrix.args }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}
+          path: |
+            release/*.dmg
+            release/*.exe
+            release/*.AppImage
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: KeyChat ${{ github.event.inputs.tag || github.ref_name }}
+          files: out/*
+          body: |
+            **Download for your computer:**
+            - Mac (Apple Silicon, M1–M4): `KeyChat-mac-arm64.dmg`
+            - Mac (Intel): `KeyChat-mac-x64.dmg`
+            - Windows: `KeyChat-win-x64.exe`
+            - Linux: `KeyChat-linux-x86_64.AppImage`
+
+            These builds aren't code-signed, so the first launch needs one extra click:
+            - **Mac:** open the app once, close the warning, then go to System Settings → Privacy & Security → "Open Anyway".
+            - **Windows:** on the blue SmartScreen box, click "More info" → "Run anyway".
+
+            Or skip installing and use the web app: https://malek1414.github.io/keychat/
