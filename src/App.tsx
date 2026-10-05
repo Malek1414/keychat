@@ -41,7 +41,10 @@ export default function App() {
   const [modelId, setModelId] = useState(loadLastModel)
   const [modelsLoading, setModelsLoading] = useState(false)
   const [sidebar, setSidebar] = useState(isWide)
-  const [settingsOpen, setSettingsOpen] = useState(() => !loadSettings().openaiKey && !loadSettings().anthropicKey)
+  const [settingsOpen, setSettingsOpen] = useState(() => {
+    const s = loadSettings()
+    return !s.openaiKey && !s.anthropicKey && !s.xaiKey && !s.openaiBaseUrl
+  })
   const [lightbox, setLightbox] = useState<string | null>(null)
   const [voice, setVoice] = useState(false)
   const [streamingId, setStreamingId] = useState<string | null>(null)
@@ -60,7 +63,7 @@ export default function App() {
   const stick = useRef(true)
   const dragDepth = useRef(0)
 
-  const firstRun = !settings.openaiKey && !settings.anthropicKey
+  const firstRun = !settings.openaiKey && !settings.anthropicKey && !settings.xaiKey && !settings.openaiBaseUrl
   const active = conversations.find((c) => c.id === activeId) ?? null
   const model = useMemo(
     () => models.find((m) => m.id === modelId) ?? models.find((m) => m.provider === 'anthropic') ?? models[0],
@@ -73,7 +76,7 @@ export default function App() {
   }, [])
 
   const refreshModels = useCallback(async (s: Settings) => {
-    if (!s.openaiKey && !s.anthropicKey) return
+    if (!s.openaiKey && !s.anthropicKey && !s.xaiKey && !s.openaiBaseUrl) return
     setModelsLoading(true)
     const list = await listModels(s)
     setModelsLoading(false)

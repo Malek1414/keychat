@@ -36,6 +36,7 @@ export function ModelPicker({ models, value, loading, onChange, onRefresh }: Pro
       [
         ['Anthropic', list.filter((m) => m.provider === 'anthropic')],
         ['OpenAI', list.filter((m) => m.provider === 'openai')],
+        ['xAI', list.filter((m) => m.provider === 'xai')],
       ] as const
     ).filter(([, l]) => l.length)
   }, [models, q])

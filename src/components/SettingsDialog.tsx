@@ -32,6 +32,18 @@ function KeyField({ label, value, onChange, placeholder, href }: { label: string
   )
 }
 
+function EndpointField({ value, onChange, placeholder, hint }: { value: string; onChange: (v: string) => void; placeholder: string; hint: string }) {
+  return (
+    <label className="field">
+      <span className="field-label">
+        API endpoint <span className="optional">Optional</span>
+      </span>
+      <input value={value} placeholder={placeholder} spellCheck={false} inputMode="url" autoComplete="off" onChange={(e) => onChange(e.target.value.trim())} />
+      <span className="hint">{hint}</span>
+    </label>
+  )
+}
+
 interface Props {
   settings: Settings
   firstRun: boolean
@@ -55,15 +67,15 @@ export function SettingsDialog({ settings, firstRun, onClose, onSave, onClearCha
 
   const save = async () => {
     setError('')
-    if (!draft.openaiKey && !draft.anthropicKey) {
-      setError('Add at least one API key.')
+    if (!draft.openaiKey && !draft.anthropicKey && !draft.xaiKey && !draft.openaiBaseUrl) {
+      setError('Add at least one API key (or an endpoint for a local server).')
       return
     }
     setChecking(true)
     const models = await listModels(draft)
     setChecking(false)
     if (!models.length) {
-      setError('Couldn’t load any models with these keys. Double-check them and try again.')
+      setError('Couldn’t load any models with these keys and endpoints. Double-check them and try again.')
       return
     }
     onSave(draft, models)
@@ -99,37 +111,49 @@ export function SettingsDialog({ settings, firstRun, onClose, onSave, onClearCha
           <div className="settings-pane">
             {tab === 'keys' && (
               <>
-                {firstRun && <p className="lede">Paste an OpenAI key, an Anthropic key, or both. You only pay the provider for what you use.</p>}
-                <KeyField
-                  label="OpenAI API key"
-                  value={draft.openaiKey}
-                  onChange={(v) => set('openaiKey', v)}
-                  placeholder="sk-..."
-                  href="https://platform.openai.com/api-keys"
-                />
-                <KeyField
-                  label="Anthropic API key"
-                  value={draft.anthropicKey}
-                  onChange={(v) => set('anthropicKey', v)}
-                  placeholder="sk-ant-..."
-                  href="https://console.anthropic.com/settings/keys"
-                />
-                <details className="advanced">
-                  <summary>Advanced: custom endpoint</summary>
-                  <label className="field">
-                    <span className="field-label">OpenAI-compatible base URL</span>
-                    <input
-                      value={draft.openaiBaseUrl}
-                      placeholder="https://openrouter.ai/api/v1"
-                      spellCheck={false}
-                      onChange={(e) => set('openaiBaseUrl', e.target.value.trim())}
-                    />
-                    <span className="hint">
-                      Leave empty for OpenAI. Set it to use OpenRouter, Groq, Together, or a local Ollama/LM Studio server, with
-                      that service’s key in the OpenAI field.
-                    </span>
-                  </label>
-                </details>
+                {firstRun && <p className="lede">Paste a key for OpenAI (GPT), Anthropic (Claude), xAI (Grok), or any mix. You only pay the provider for what you use.</p>}
+                <div className="provider-group">
+                  <div className="provider-name">OpenAI</div>
+                  <KeyField
+                    label="API key"
+                    value={draft.openaiKey}
+                    onChange={(v) => set('openaiKey', v)}
+                    placeholder="sk-..."
+                    href="https://platform.openai.com/api-keys"
+                  />
+                  <EndpointField
+                    value={draft.openaiBaseUrl}
+                    onChange={(v) => set('openaiBaseUrl', v)}
+                    placeholder="https://api.openai.com/v1"
+                    hint="Leave empty for OpenAI. Any OpenAI-compatible endpoint works too: OpenRouter, Groq, Together, Azure, or a local Ollama / LM Studio server (e.g. http://localhost:11434/v1)."
+                  />
+                </div>
+                <div className="provider-group">
+                  <div className="provider-name">Anthropic (Claude)</div>
+                  <KeyField
+                    label="API key"
+                    value={draft.anthropicKey}
+                    onChange={(v) => set('anthropicKey', v)}
+                    placeholder="sk-ant-..."
+                    href="https://console.anthropic.com/settings/keys"
+                  />
+                  <EndpointField
+                    value={draft.anthropicBaseUrl}
+                    onChange={(v) => set('anthropicBaseUrl', v)}
+                    placeholder="https://api.anthropic.com"
+                    hint="Leave empty for Anthropic. Set it to route Claude through a proxy or gateway."
+                  />
+                </div>
+                <div className="provider-group">
+                  <div className="provider-name">xAI (Grok)</div>
+                  <KeyField
+                    label="API key"
+                    value={draft.xaiKey}
+                    onChange={(v) => set('xaiKey', v)}
+                    placeholder="xai-..."
+                    href="https://console.x.ai"
+                  />
+                </div>
                 <p className="privacy">
                   <Lock size={14} /> Keys are saved only on this device and sent only to the provider you call. There is no
                   server in between.

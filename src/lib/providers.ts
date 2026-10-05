@@ -7,20 +7,32 @@ import type { Attachment, Message, ModelOption, Settings } from './types'
 // which is why the browser-access flags are on: there is no server in between.
 function openai(s: Settings) {
   return new OpenAI({
-    apiKey: s.openaiKey,
-    baseURL: s.openaiBaseUrl.trim() || undefined,
+    // Local servers (Ollama, LM Studio) don't need a key, but the SDK insists on one.
+    apiKey: s.openaiKey || 'no-key',
+    baseURL: s.openaiBaseUrl.trim().replace(/\/+$/, '') || undefined,
     dangerouslyAllowBrowser: true,
   })
 }
 
+// Grok speaks the OpenAI chat format, so it rides on the OpenAI SDK.
+function xai(s: Settings) {
+  return new OpenAI({ apiKey: s.xaiKey, baseURL: 'https://api.x.ai/v1', dangerouslyAllowBrowser: true })
+}
+
 function anthropic(s: Settings) {
-  return new Anthropic({ apiKey: s.anthropicKey, dangerouslyAllowBrowser: true })
+  return new Anthropic({
+    apiKey: s.anthropicKey,
+    // The SDK appends /v1/messages itself, so accept URLs pasted with or without /v1.
+    baseURL: s.anthropicBaseUrl.trim().replace(/\/+$/, '').replace(/\/v1$/, '') || undefined,
+    dangerouslyAllowBrowser: true,
+  })
 }
 
 export const FALLBACK_MODELS: ModelOption[] = [
   { id: 'anthropic:claude-opus-5', provider: 'anthropic', model: 'claude-opus-5', label: 'Claude Opus 5', maxTokens: 64000 },
   { id: 'anthropic:claude-sonnet-5', provider: 'anthropic', model: 'claude-sonnet-5', label: 'Claude Sonnet 5', maxTokens: 64000 },
   { id: 'anthropic:claude-haiku-4-5', provider: 'anthropic', model: 'claude-haiku-4-5', label: 'Claude Haiku 4.5', maxTokens: 64000 },
+  { id: 'xai:grok-4', provider: 'xai', model: 'grok-4', label: 'Grok 4' },
   { id: 'openai:gpt-4o', provider: 'openai', model: 'gpt-4o', label: 'GPT-4o' },
   { id: 'openai:gpt-4o-mini', provider: 'openai', model: 'gpt-4o-mini', label: 'GPT-4o mini' },
 ]
@@ -63,8 +75,8 @@ export async function listModels(s: Settings): Promise<ModelOption[]> {
     )
   }
 
-  if (s.openaiKey) {
-    const custom = Boolean(s.openaiBaseUrl.trim())
+  if (s.openaiKey || s.openaiBaseUrl.trim()) {
+    const custom = Boolean(s.openaiBaseUrl.trim()) && !/api\.openai\.com/.test(s.openaiBaseUrl)
     jobs.push(
       (async () => {
         const found: (ModelOption & { created: number })[] = []
@@ -86,8 +98,31 @@ export async function listModels(s: Settings): Promise<ModelOption[]> {
     )
   }
 
+  if (s.xaiKey) {
+    jobs.push(
+      (async () => {
+        const found: (ModelOption & { created: number })[] = []
+        for await (const m of xai(s).models.list()) {
+          if (!/^grok/.test(m.id) || /(image|imagine|vision-beta|-\d{4}$)/.test(m.id)) continue
+          found.push({
+            id: `xai:${m.id}`,
+            provider: 'xai',
+            model: m.id,
+            label: m.id.replace(/^grok-/, 'Grok ').replace(/-/g, ' '),
+            created: m.created ?? 0,
+          })
+        }
+        found.sort((a, b) => b.created - a.created)
+        out.push(...found.map(({ created: _c, ...rest }) => rest))
+      })().catch(() => {
+        out.push(...FALLBACK_MODELS.filter((m) => m.provider === 'xai'))
+      }),
+    )
+  }
+
   await Promise.all(jobs)
-  return out
+  const order = { anthropic: 0, openai: 1, xai: 2 }
+  return out.sort((a, b) => order[a.provider] - order[b.provider])
 }
 
 function textFileBlock(a: Attachment) {
@@ -182,8 +217,21 @@ export async function streamChat(a: StreamArgs): Promise<StreamResult> {
   const thoughtFor = () =>
     thinkingAt && firstTextAt ? Math.max(1, Math.round((firstTextAt - started) / 1000)) : undefined
 
+  if (a.model.provider === 'xai') {
+    if (!a.settings.xaiKey) throw new Error('Add an xAI API key in Settings to use Grok.')
+    if (a.messages.some((m) => m.attachments?.some((x) => x.kind === 'pdf'))) {
+      throw new Error('Grok can’t read PDFs here yet. Photos and text files work, or switch to a GPT or Claude model for PDFs.')
+    }
+    const stream = await xai(a.settings).chat.completions.create(
+      { model: a.model.model, messages: toOpenAI(a.messages, a.settings.systemPrompt), stream: true },
+      { signal: a.signal },
+    )
+    for await (const chunk of stream) text(chunk.choices[0]?.delta?.content ?? '')
+    return {}
+  }
+
   if (a.model.provider === 'openai') {
-    if (!a.settings.openaiKey) throw new Error('Add an OpenAI API key in Settings to use this model.')
+    if (!a.settings.openaiKey && !a.settings.openaiBaseUrl.trim()) throw new Error('Add an OpenAI API key in Settings to use this model.')
     const stream = await openai(a.settings).chat.completions.create(
       { model: a.model.model, messages: toOpenAI(a.messages, a.settings.systemPrompt), stream: true },
       { signal: a.signal },

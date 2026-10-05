@@ -1,4 +1,4 @@
-export type Provider = 'openai' | 'anthropic'
+export type Provider = 'openai' | 'anthropic' | 'xai'
 
 export interface Attachment {
   id: string
@@ -47,8 +47,12 @@ export interface ModelOption {
 export interface Settings {
   openaiKey: string
   anthropicKey: string
+  /** xAI key for Grok models. */
+  xaiKey: string
   /** Optional OpenAI-compatible endpoint (OpenRouter, Groq, Ollama, LM Studio...). */
   openaiBaseUrl: string
+  /** Optional Anthropic-compatible endpoint (a proxy or gateway). */
+  anthropicBaseUrl: string
   systemPrompt: string
   theme: 'system' | 'light' | 'dark'
   voice: string
@@ -57,7 +61,9 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   openaiKey: '',
   anthropicKey: '',
+  xaiKey: '',
   openaiBaseUrl: '',
+  anthropicBaseUrl: '',
   systemPrompt: '',
   theme: 'system',
   voice: 'marin',

@@ -1,6 +1,6 @@
 # KeyChat
 
-A clean, ChatGPT-style chat app for **OpenAI (GPT)** and **Anthropic (Claude)** models. Bring your own API key; there's no account, no subscription and no server.
+A clean, ChatGPT-style chat app for **OpenAI (GPT)**, **Anthropic (Claude)** and **xAI (Grok)** models. Bring your own API key; there's no account, no subscription and no server.
 
 **Use it in the browser:** https://malek1414.github.io/keychat/
 
@@ -8,7 +8,7 @@ It runs on phone and desktop browsers. On a phone, use *Share → Add to Home Sc
 
 ## What it does
 
-- **Chat with GPT and Claude models.** The model list loads from your keys, so new models show up on their own. Replies stream in, with markdown, code highlighting, tables and copy buttons.
+- **Chat with GPT, Claude and Grok models.** The model list loads from your keys, so new models show up on their own. Replies stream in, with markdown, code highlighting, tables and copy buttons.
 - **Photos.** Tap **+** → *Add photos & files*, or paste, or drag and drop. On a phone you also get *Take photo*. Thumbnails appear in the message box before you send; tap any image to view it full screen. Big photos are resized automatically to stay under the provider limits.
 - **Files.** PDFs plus text and code files (`.txt`, `.md`, `.csv`, `.json`, `.py`, `.js`, …) are read by the model.
 - **Voice typing.** Tap the 🎤 mic, talk, then ✓. Your speech becomes text in the box, ready to edit and send, the same way ChatGPT's dictation works.
@@ -22,12 +22,15 @@ Voice features use your **OpenAI** key (OpenAI transcription and text-to-speech)
 
 - OpenAI: https://platform.openai.com/api-keys
 - Anthropic (Claude): https://console.anthropic.com/settings/keys
+- xAI (Grok): https://console.x.ai
 
-Paste one or both into the welcome screen. You pay the provider directly for what you use.
+Paste any of them into the welcome screen. You pay the provider directly for what you use.
 
-**Privacy:** keys and chats are stored only on your device (browser storage). Requests go straight from your device to OpenAI or Anthropic; nothing passes through anyone else's server.
+**Privacy:** keys and chats are stored only on your device (browser storage). Requests go straight from your device to OpenAI, Anthropic or xAI; nothing passes through anyone else's server.
 
-**Other providers:** under *Settings → API keys → Advanced* you can set an OpenAI-compatible base URL to use OpenRouter, Groq, Together, or a local Ollama / LM Studio server.
+**Custom endpoints:** each provider in *Settings → API keys* has an optional *API endpoint* field. Point the OpenAI one at any OpenAI-compatible server (OpenRouter, Groq, Together, Azure, local Ollama / LM Studio), or route Claude through a proxy.
+
+Grok reads photos and text files; for PDFs, use a GPT or Claude model.
 
 ## Desktop app (macOS, Windows, Linux)
 

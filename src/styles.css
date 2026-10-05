@@ -1369,6 +1369,23 @@ a {
   flex-shrink: 0;
   margin-top: 2px;
 }
+.provider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.provider-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+.field-label .optional {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text-3);
+}
 .advanced summary {
   cursor: pointer;
   font-size: 14px;
