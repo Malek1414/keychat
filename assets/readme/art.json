@@ -1,0 +1,106 @@
+{
+  "_generator": "https://github.com/Malek1414/Malek1414/blob/main/tools/readme_art.py",
+  "title": "KeyChat",
+  "tagline": "Chat with GPT, Claude and Grok on your own API keys.",
+  "chips": [
+    "web + desktop",
+    "*bring your own key",
+    "voice mode",
+    "no server"
+  ],
+  "footer_left": "Malek Hassan · Berlin · 2026",
+  "footer_right": "React · Vite · Electron",
+  "alt": "KeyChat: a pixel bird with a key for a tail, lifting its wing while it types a chat bubble",
+  "accent": "key",
+  "colors": {
+    "key": [
+      "#ffc83d",
+      "#c98a00"
+    ],
+    "wing": [
+      "#d9951a",
+      "#8a5a00"
+    ],
+    "eye": [
+      "#0d1117",
+      "#1f2328"
+    ],
+    "beak": [
+      "#ff7a45",
+      "#d9480f"
+    ],
+    "bubble": [
+      "#58a6ff",
+      "#0969da"
+    ],
+    "dots": [
+      "#ffffff",
+      "#ffffff"
+    ]
+  },
+  "legend": {
+    "K": [
+      "key",
+      "body"
+    ],
+    "E": [
+      "eye",
+      "body"
+    ],
+    "P": [
+      "beak",
+      "body"
+    ],
+    "F": [
+      "beak",
+      "body"
+    ],
+    "T": [
+      "key",
+      "tail"
+    ],
+    "W": [
+      "wing",
+      "wing"
+    ],
+    "S": [
+      "bubble",
+      "bubble"
+    ],
+    "D": [
+      "dots",
+      "dots"
+    ]
+  },
+  "motions": {
+    "wing": "flap",
+    "dots": "flicker",
+    "tail": "rock"
+  },
+  "origins": {
+    "wing": "100% 0%",
+    "tail": "100% 30%"
+  },
+  "sprite": [
+    ".........................SSSSS..",
+    "........................SSSSSSS.",
+    "........................SDSDSDS.",
+    "........................SSSSSSS.",
+    ".................KK......SSSSS..",
+    "................KKKK.......S....",
+    "..............KKKKKKKK....S.....",
+    ".............KKKKKKKKKK.........",
+    "............KKKKKKKKEEKK........",
+    "............KKKKKKKKEEKKPPP.....",
+    "...........KKKKWWWWWKKKKPP......",
+    ".TTTTTTTTTTKKKWWWWWWKKKKK.......",
+    ".TTTTTTTTTTKKWWWWWWKKKKKK.......",
+    ".TT.TT.TT..KWWWWWWKKKKKKK.......",
+    ".TT.TT......KWWWKKKKKKKK........",
+    ".TT.........KKKKKKKKKKKK........",
+    ".............KKKKKKKKKK.........",
+    "..............KKKKKKKK..........",
+    "................KKKK............",
+    "...............FF..FF..........."
+  ]
+}
